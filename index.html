@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HK inno.N SCM Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+:root{--card:#1e2130;--border:#2d3148;--accent:#4f8ef7;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--muted:#8892aa}
+header{background:#1a1d27;border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:15px;font-weight:700;color:#fff}.logo span{color:var(--accent)}
+.hdr-r{display:flex;align-items:center;gap:8px}
+#clock{font-size:12px;color:var(--muted)}
+.btn{background:#2d3148;border:1px solid var(--border);color:#fff;padding:5px 11px;border-radius:7px;cursor:pointer;font-size:11px}
+.btn:hover{background:#3d4268}
+.main{padding:14px 18px;max-width:1400px;margin:0 auto}
+.sec{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.live{background:var(--green);box-shadow:0 0 5px var(--green)}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.lbl{font-size:10px;color:var(--muted);margin-bottom:4px}
+.val{font-size:20px;font-weight:700;color:#fff}
+.sub{font-size:10px;color:var(--muted)}
+.row-b{display:flex;align-items:center;justify-content:space-between;margin-top:5px}
+.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block}
+.up{background:rgba(34,197,94,.15);color:var(--green)}
+.dn{background:rgba(239,68,68,.15);color:var(--red)}
+.neu{background:rgba(99,102,241,.15);color:#818cf8}
+.setup-box{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.4);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.setup-box h3{font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:8px}
+.setup-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.setup-row label{font-size:11px;color:#93c5fd;width:90px;flex-shrink:0}
+.setup-row input{flex:1;background:#2d3148;border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:#fff;font-size:12px;font-family:monospace}
+.apply-btn{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:7px 18px;font-size:12px;cursor:pointer;font-weight:600}
+.link-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;transition:border-color .2s}
+.link-card:hover{border-color:var(--accent)}
+.link-card h3{font-size:12px;font-weight:600;color:#fff;margin-bottom:3px}
+.link-card p{font-size:10px;color:var(--muted);margin-bottom:7px}
+.link-card a{font-size:11px;color:var(--accent);text-decoration:none}
+.notif{position:fixed;top:52px;left:50%;transform:translateX(-50%);background:#1e2130;border:1px solid var(--yellow);border-radius:10px;padding:8px 16px;font-size:12px;color:#fde68a;z-index:300;display:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.ap{position:fixed;right:14px;top:54px;width:290px;background:#1e2130;border:1px solid var(--border);border-radius:12px;padding:14px;z-index:200;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.ap.open{display:block}
+.ap-hdr{font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;display:flex;justify-content:space-between}
+.ap-close{cursor:pointer;color:var(--muted)}
+.ap-row{margin-bottom:8px}
+.ap-row label{font-size:10px;color:var(--muted);display:block;margin-bottom:3px}
+.ap-row input{width:100%;background:#2d3148;border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:#fff;font-size:12px}
+.save-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:7px;padding:7px;font-size:12px;cursor:pointer;margin-top:6px}
+.al-list{max-height:150px;overflow-y:auto;margin-top:10px}
+.al-item{background:#2d3148;border-left:2px solid var(--yellow);border-radius:6px;padding:6px 8px;margin-bottom:5px;font-size:11px;color:#cbd5e1;display:flex;justify-content:space-between;align-items:center}
+.spin{display:inline-block;animation:spin 1s linear infinite;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;padding:6px 8px;color:var(--muted);border-bottom:1px solid var(--border);font-weight:600;font-size:10px}
+td{padding:6px 8px;border-bottom:1px solid rgba(45,49,72,.4);color:#cbd5e1}
+tr:last-child td{border-bottom:none}
+footer{text-align:center;padding:14px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);margin-top:18px}
+@media(max-width:900px){.g5{grid-template-columns:repeat(3,1fr)}.g4,.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.g5,.g4,.g3,.g2{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="notif" id="notif"></div>
+
+<header>
+  <div class="logo">🏢 HK inno.N <span>SCM Dashboard</span></div>
+  <div class="hdr-r">
+    <span id="clock"></span>
+    <button class="btn" onclick="toggleAP()">🔔 알림설정</button>
+    <button class="btn" onclick="loadFX()">↺ 새로고침</button>
+  </div>
+</header>
+
+<div class="ap" id="ap">
+  <div class="ap-hdr">알림 임계값 <span class="ap-close" onclick="toggleAP()">✕</span></div>
+  <div class="ap-row"><label>환율 급변 (%)</label><input id="t-fx" type="number" value="1.5" step="0.1"></div>
+  <button class="save-btn" onclick="saveAP()">저장</button>
+  <div style="font-size:10px;color:var(--muted);margin-top:10px;margin-bottom:4px">발생 알림</div>
+  <div class="al-list" id="al-list"><div style="font-size:11px;color:var(--muted)">알림 없음</div></div>
+</div>
+
+<div class="main">
+
+  <!-- 환율 -->
+  <div class="sec"><span class="dot live"></span> 실시간 환율 (ECB 기준)</div>
+  <div class="g5" id="fx-grid"><div class="card" style="grid-column:1/-1;color:var(--muted);font-size:12px;padding:14px"><span class="spin">⟳</span> 환율 불러오는 중...</div></div>
+
+  <!-- 유가 바로가기 -->
+  <div class="sec">🛢️ 유가 & 에너지 (바로가기)</div>
+  <div class="g3">
+    <div class="link-card"><h3>🛢️ 브렌트유 / WTI유</h3><p>실시간 유가 차트 및 시세</p><a href="https://tradingeconomics.com/commodity/crude-oil" target="_blank">TradingEconomics ↗</a></div>
+    <div class="link-card"><h3>✈️ 항공유 / 나프타</h3><p>항공유, 나프타 시세</p><a href="https://tradingeconomics.com/commodity/jet-fuel" target="_blank">TradingEconomics ↗</a></div>
+    <div class="link-card"><h3>⚗️ 에탄올 / 메탄올</h3><p>에탄올, 메탄올 가격</p><a href="https://www.methanex.com/our-business/pricing" target="_blank">Methanex / CEPEA ↗</a></div>
+  </div>
+
+  <!-- 원자재 바로가기 -->
+  <div class="sec">🏭 원자재 (바로가기)</div>
+  <div class="g4">
+    <div class="link-card"><h3>🔬 팔라듐</h3><p>팔라듐 실시간 시세</p><a href="https://tradingeconomics.com/commodity/palladium" target="_blank">TradingEconomics ↗</a></div>
+    <div class="link-card"><h3>🌽 대두유 / 옥수수</h3><p>농산물 원자재 시세</p><a href="https://tradingeconomics.com/commodity/corn" target="_blank">TradingEconomics ↗</a></div>
+    <div class="link-card"><h3>🔩 알루미늄 / 구리</h3><p>금속 원자재 시세</p><a href="https://tradingeconomics.com/commodity/aluminum" target="_blank">TradingEconomics ↗</a></div>
+    <div class="link-card"><h3>🧪 폴리머류 / 고무</h3><p>PE, PVC, PP, 천연고무</p><a href="https://www.chemorbis.com/en/" target="_blank">ChemOrbis ↗</a></div>
+  </div>
+
+  <!-- 규제/뉴스 -->
+  <div class="sec">📋 규제 & 뉴스 바로가기</div>
+  <div class="g2">
+    <div class="link-card"><h3>🏥 식약처 품목허가 현황</h3><p>의약품 품목허가·신고·심사 정보 검색</p><a href="https://nedrug.mfds.go.kr/pbp/CCBAE01" target="_blank">nedrug.mfds.go.kr ↗</a></div>
+    <div class="link-card"><h3>🧪 식약처 원료의약품 등록현황</h3><p>원료의약품 등록 및 변경 현황 조회</p><a href="https://nedrug.mfds.go.kr/pbp/CCBAC03" target="_blank">nedrug.mfds.go.kr ↗</a></div>
+    <div class="link-card"><h3>🇺🇸 US-FDA 워닝레터</h3><p>FDA 경고서한 최신 현황 조회</p><a href="https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters" target="_blank">fda.gov ↗</a></div>
+    <div class="link-card"><h3>📰 데일리팜 종합뉴스</h3><p>제약·바이오 업계 최신 뉴스</p><a href="https://dailypharm.com/user/news?group=%EC%A2%85%ED%95%A9" target="_blank">dailypharm.com ↗</a></div>
+  </div>
+
+  <!-- 알림 이력 -->
+  <div class="sec">🔔 알림 이력</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>시각</th><th>내용</th><th>변동</th></tr></thead>
+      <tbody id="al-table"><tr><td colspan="3" style="text-align:center;color:var(--muted);padding:16px">알림 없음</td></tr></tbody>
+    </table>
+  </div>
+
+</div>
+<footer>HK inno.N SCM Dashboard · 환율: ECB(Frankfurter) via Render · 갱신: <span id="last-upd">—</span></footer>
+
+<script>
+let THR = {fx:1.5};
+let ALERTS = [];
+
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleString('ko-KR')},1000);
+
+function pushNotif(msg,pct,dir){
+  const el=document.getElementById('notif');
+  el.textContent='🔔 '+msg; el.style.display='block';
+  setTimeout(()=>el.style.display='none',5000);
+  if(Notification.permission==='granted') new Notification('HK inno.N SCM',{body:msg});
+  ALERTS.unshift({t:new Date().toLocaleTimeString('ko-KR'),msg,pct,dir});
+  renderAlerts();
+}
+function renderAlerts(){
+  const list=document.getElementById('al-list');
+  const tbody=document.getElementById('al-table');
+  if(!ALERTS.length){
+    list.innerHTML='<div style="font-size:11px;color:var(--muted)">알림 없음</div>';
+    tbody.innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:16px">알림 없음</td></tr>';
+    return;
+  }
+  list.innerHTML=ALERTS.slice(0,6).map(a=>`<div class="al-item"><span>${a.msg}</span><span style="font-size:9px;color:var(--muted)">${a.t}</span></div>`).join('');
+  tbody.innerHTML=ALERTS.slice(0,20).map(a=>`<tr><td>${a.t}</td><td>${a.msg}</td><td style="color:${a.dir==='up'?'#ef4444':'#22c55e'}">${a.pct||''}</td></tr>`).join('');
+}
+function toggleAP(){document.getElementById('ap').classList.toggle('open')}
+function saveAP(){
+  THR.fx=parseFloat(document.getElementById('t-fx').value)||1.5;
+  if(Notification.permission!=='granted') Notification.requestPermission();
+  toggleAP();
+}
+function mkBadge(pct){
+  if(pct==null) return '<span class="badge neu">—</span>';
+  const str=(pct>=0?'+':'')+pct.toFixed(2)+'%';
+  const cls=pct>=0?'up':'dn';
+  return `<span class="badge ${cls}">${str}</span>`;
+}
+
+async function loadFX(){
+  const grid=document.getElementById('fx-grid');
+  grid.innerHTML=`<div class="card" style="grid-column:1/-1;color:var(--muted);font-size:12px;padding:14px"><span class="spin">⟳</span> 환율 불러오는 중...</div>`;
+  try{
+    const pairs=[
+      {label:'USD/KRW', from:'USD', sub:'원'},
+      {label:'EUR/KRW', from:'EUR', sub:'원'},
+      {label:'JPY/KRW', from:'JPY', sub:'원(100엔)'},
+      {label:'GBP/KRW', from:'GBP', sub:'원'},
+      {label:'CHF/KRW', from:'CHF', sub:'원'},
+    ];
+    const [todayRes, yesRes] = await Promise.all([
+      Promise.all(pairs.map(p=>fetch(`https://api.frankfurter.app/latest?from=${p.from}&to=KRW`).then(r=>r.json()))),
+      Promise.all(pairs.map(p=>fetch(`https://api.frankfurter.app/latest?from=${p.from}&to=KRW`).then(r=>r.json()))),
+    ]);
+    grid.innerHTML=pairs.map((p,i)=>{
+      let val=todayRes[i]?.rates?.KRW;
+      if(!val) return `<div class="card"><div class="lbl">${p.label}</div><div style="font-size:12px;color:var(--muted)">데이터 없음</div></div>`;
+      if(p.from==='JPY') val=val*100;
+      const date=todayRes[i]?.date||'';
+      const disp=p.from==='JPY'?val.toFixed(2):Math.round(val).toLocaleString('ko-KR');
+      return `<div class="card">
+        <div class="lbl">${p.label}</div>
+        <div class="val">${disp}</div>
+        <div class="row-b"><span class="sub">${p.sub} · ${date}</span><span class="badge neu">ECB</span></div>
+      </div>`;
+    }).join('');
+    document.getElementById('last-upd').textContent=new Date().toLocaleTimeString('ko-KR');
+  } catch(e){
+    document.getElementById('fx-grid').innerHTML=`<div class="card" style="grid-column:1/-1;color:#ef4444;font-size:12px;padding:14px">⚠️ 환율 로드 실패: ${e.message}</div>`;
+  }
+}
+
+loadFX();
+if(Notification.permission==='default') setTimeout(()=>Notification.requestPermission(),2000);
+</script>
+</body>
+</html>
