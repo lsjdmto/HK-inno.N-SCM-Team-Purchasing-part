@@ -156,7 +156,7 @@ async function loadFX(){
   const grid=document.getElementById('fx-grid');
   grid.innerHTML=`<div class="card" style="grid-column:1/-1;color:var(--muted);font-size:12px;padding:14px"><span class="spin">⟳</span> 환율 불러오는 중...</div>`;
   try{
-    const r = await fetch('https://api.frankfurter.app/latest?from=USD&to=KRW,EUR,JPY,GBP,CHF');
+    const r = await fetch('https://open.er-api.com/v6/latest/USD');
     const d = await r.json();
     const usdKrw = d.rates.KRW;
     const pairs = [
@@ -166,10 +166,11 @@ async function loadFX(){
       {label:'GBP/KRW', value: usdKrw / d.rates.GBP,          sub:'원'},
       {label:'CHF/KRW', value: usdKrw / d.rates.CHF,          sub:'원'},
     ];
+    const date = new Date(d.time_last_update_utc).toLocaleDateString('ko-KR');
     grid.innerHTML=pairs.map(p=>`<div class="card">
       <div class="lbl">${p.label}</div>
       <div class="val">${p.label==='JPY/KRW'?p.value.toFixed(2):Math.round(p.value).toLocaleString('ko-KR')}</div>
-      <div class="row-b"><span class="sub">${p.sub} · ${d.date}</span><span class="badge neu">ECB</span></div>
+      <div class="row-b"><span class="sub">${p.sub} · ${date}</span><span class="badge neu">실시간</span></div>
     </div>`).join('');
     document.getElementById('last-upd').textContent=new Date().toLocaleTimeString('ko-KR');
   } catch(e){
